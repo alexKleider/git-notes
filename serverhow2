@@ -1,0 +1,35 @@
+
+Setting up one's own git server:
+(see also Chacon)
+
+The Goal:
+to be able to-
+$ git clone ssh://indi303.net:5322/mnt/Var/GitHub/Maxwell.git
+
+Steps taken to make the above possible:
+
+On local machine from within /path/to/projects directory:
+$ git clone --bare my_project my_project.git
+Then copy/scp/rsync the my_project.git directory to your server.
+
+In the case of indi303.net, a user's public key must be appended to
+their .ssh/authorized_keys file.
+
+
+Alternatively, can set up an empty bare repository on your server
+as follows:
+$ cd /mnt/Var/GitHub
+$ mkdir newproject.git
+$ cd newproject.git
+$ git --bare init
+
+Then from your working machine:
+From within your git repo:
+## use 'indi' instead of 'origin' if already using 'origin' for github.
+$ git remote add origin ssh://alex@indi303.net:5322/mnt/Var/GitHub/Maxwell.git
+$ git push --set-upstream origin master
+
+# Maxwell has remote only at indi
+# Rachel has remote origin at github and indi at indi303.net:5322
+# debk has remote origin at github and indi at indi303.net:5322
+

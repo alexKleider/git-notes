@@ -1,0 +1,295 @@
+#!To log on directly:
+alex@x301:~/Python/AWS/Colab$ ssh -i ../aws0key.pem ec2-user@54.215.162.118
+
+"""
+The parent directory 'was' "ansible_aws_playbooks" but I've shortened it
+to "Colab" (for Colaboration) for the sake of brevity and also because
+I am trying to stick to my convention of naming directories with 1st letter
+upper case.
+
+This 'Colab'orative effort began Saturday July 12, 2014 on the invitation
+of Glen Jarvis with Abe, his mentee.
+"""
+
+# GIT WORK-FLOW #
+git clone https://github....
+git checkout develop  # Remember we never touch master
+git branch feature/some_thing_new  # we only change branches of feature
+git checkout feature/some_thing_new  # we don't change feature itself
+# The above three commands can be combined into one,
+# but this practice is STRONGLY discouraged:
+    git checkout -b feature/some_thing_new develop
+# work on the code base
+git diff file_changed
+git add file_changed
+# repeat the above for each file that was changed.
+git status
+git commit  # use present imperative
+git status
+# submit the pull request:
+# ! But first be sure .git/config is correct (i.e. => develop)
+git push origin feature/some_thing_new
+# _AFTER_ it has been merged:
+git checkout develop  # a combo of fetch and merge
+# The following must be done to complete the cycle.
+git pull  # sync with develop after merge 
+# In other environments the merge might be done locally:
+    git checkout develop
+    git merge --no-ff /feature/some_thing_new
+    git push origin develop  # but this is NOT our work flow
+    """We just don't want to use the `git merge` command 
+       (GitHub does that behind the scenes)"""gj in an email
+git branch -d /feature/some_thing_new
+# also should delete feature/some_thing_new branch on github
+git branch feature/some_thing_else
+git checkout feature/some_thing_else
+
+
+master branch  Never work on this branch
+we work off of a branch of develop i.e. feature branches.
+May at times use 'bug' rather than 'feature' as appropriate.
+
+My first "contribution" has to do with the pem file and our decision 
+to use symlinks as a mechanism to keep it out of the public eye.
+ln -s ../aws0key.pem server.pem
+cat server.pem
+vim .gitignore  # added server.pem
+git pull  # does a fetch and a merge
+# ? This overwrites the develop branch already on my laptop with the one
+# that is on the repository
+git checkout develop 
+# ? This makes the develop branch my working version?
+git pull
+# ? Why the same command again?
+git log
+git branch --merged
+# ? What does the above do?
+git branch -d feature/fixed_ansible_config 
+git branch
+exit
+
+The following is Glen's response to my questions:
+    git pull 
+    # ? This overwrites the develop branch already on my laptop with the
+    # one that is on the repository 
+"git pull" is actually a combination of other git steps. You could manually
+do the same thing without using the keyword "pull" (but I've never tried).
+"git pull" is really:
+1) git fetch
+2) git merge
+Don't forget that the GitHub account has it's own ".git" directory and your
+computer has it's own ".git" directory. "git fetch" fetches the stuff on
+the GitHub .git directory (that you don't already have in yours). So, in
+short, it makes your local repository "up to date" with the repository in
+GitHub (and the repository is really all the stuff in the ".git"
+sub-directory).  There's no issue doing a "git fetch."
+Git merge, however, means merging the data retrieved into the current
+branch. So, if you fetched more records that should be in the develop
+branch, then it will put those in the develop branch on your side.
+So, it "sort of" overwrites the develop branch on your laptop with the one
+on GitHub. Really, what it does is pick out the records that need to be
+added to your local branch and tack them on so that, when you're done, your
+branch is the same as the parent branch.
+I'm abbreviating some to avoid a long discussion about the internal
+architecture of what git data structures look like (remember that each
+commit is a guaranteed unique hash with a pointer to the next commit; thus,
+when records are retrieved, with pointers to the current tree, it's pretty
+easy to put them in the right place).
+    git checkout develop 
+    # ? This makes the develop branch my working version? 
+That's exactly right. These "branches" are actually internally just
+pointers to places in the tree. And, you are setting the main pointer to
+the version you want to use. This is actually stored as flat files that are
+easy to read.
+prompt> git branch
+  develop
+* master
+prompt> cat .git/HEAD
+ref: refs/heads/master
+prompt> git checkout develop
+Switched to branch 'develop'
+Your branch is up-to-date with 'origin/develop'.
+prompt> cat .git/HEAD
+ref: refs/heads/develop
+And, if you *really* wanted to look further under the hood. It's actually
+pretty easy to see what's going on too. Imagine that you were on master
+`git checkout master` (thus, the HEAD pointer would be refs/heads/master).
+Well, what does that point to?
+prompt> cat .git/refs/heads/master
+d902b1ce3b733835f6fe3d2ef1c33f910c13be9a
+Well, cool. I can see exactly what point in the tree that I'm looking at.
+Cool. Can I look deeper?
+nothing to commit, working directory clean
+(virtualenv-1.11.6)Glens-MacBook-Pro:ansible_aws_playbooks glenjarvis$ git
+show d902b1ce3b733835f6fe3d2ef1c33f910c13be9a
+commit d902b1ce3b733835f6fe3d2ef1c33f910c13be9a
+Author: Glen Jarvis <glen@glenjarvis.com>
+Date:   Wed Jan 1 18:36:45 2014 -0800
+    Initial commit
+[blah blah]
+Well, crikey, my master is pointing to my initial commit. (confirm with git log)
+prompt> git checkout master
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
+prompt> git log
+commit d902b1ce3b733835f6fe3d2ef1c33f910c13be9a
+Author: Glen Jarvis <glen@glenjarvis.com>
+Date:   Wed Jan 1 18:36:45 2014 -0800
+    Initial commit
+    git pull 
+    # ? Why the same command again? 
+You were on the wrong branch the first time. So, you had to switch branches
+and then try again.
+git branch --merged
+# ? What does the above do?
+This shows a list of branches that have been merged into the current branch
+(the one that you're on).
+
+Suggested reading:
+        http://nvie.com/posts/a-successful-git-branching-model/ 
+
+e-mails Sunday July 13, 2014:
+9:53
+At your convenience, would you mind reviewing this pull request:
+https://github.com/glenjarvis/ansible_aws_playbooks/pull/10
+
+10:05
+If you want to run the code, play with it, etc., just:
+1) on develop: git pull (just for the fetch part of it; but a good habit). 
+Step 2 won't work if you don't fetch the data that has the branch in it
+2) git checkout feature/clarify_for_sharing_with_other_engineers
+3) play to your hearts content
+4) git checkout develop when you're done
+
+11:36
+Configuration should be successful for `external_vars.yml`. However, one
+would need a genuine copy of external_vars.yml to be able to play this
+playbook. There are several private variables that are needed for these
+playbooks. For example:
+[For accessing s3 bucket]
+* ansible_deploy_aws_access_key
+* ansible_deploy_aws_secret_key
+[For configuring deploy]
+* git_deploy_public_key
+* git_deploy_private_key
+These are not specific to individuals, but to the playbooks we are
+deploying (e.g., retrieving a file from s3 bucket during the deploy).
+You can merge this Pull Request by running:
+  git pull https://github.com/glenjarvis/ansible_aws_playbooks
+feature/add_external_vars_configuration
+Or you can view, comment on it, or merge it on-line at:
+  https://github.com/glenjarvis/ansible_aws_playbooks/pull/11
+-- Commit Summary --
+  * Update README with Linux flavor statement
+  * Add configuration script for user convenience
+  * Fix stale comments on configure() function
+  * Update configure.py to also link external_vars.yml
+-- File Changes --
+    M README.md (26)
+    A configure.py (166)
+-- Patch Links --
+https://github.com/glenjarvis/ansible_aws_playbooks/pull/11.patch
+https://github.com/glenjarvis/ansible_aws_playbooks/pull/11.diff
+---
+Reply to this email directly or view it on GitHub:
+https://github.com/glenjarvis/ansible_aws_playbooks/pull/11
+
+12:00
+NOTE: It is recommended to review pull requests
+https://github.com/glenjarvis/ansible_aws_playbooks/pull/10 and
+https://github.com/glenjarvis/ansible_aws_playbooks/pull/11 before this
+pull request (as it builds upon the same work).
+
+Most projects have three tiers (development, staging and production). 
+The ansible_hosts file has been updated to reflect this system (e.g.,
+production_webservers, staging_webservers, and development_webserver).
+
+To also allow better management, DNS names have been included. 
+Instructions for overriding the `/etc/hosts` file during development 
+has been included in the README.
+You can merge this Pull Request by running:
+  git pull https://github.com/glenjarvis/ansible_aws_playbooks
+feature/update_ansible_hosts_to_three_tiers
+Or you can view, comment on it, or merge it on-line at:
+  https://github.com/glenjarvis/ansible_aws_playbooks/pull/12
+-- Commit Summary --
+  * Update README with Linux flavor statement
+  * Add configuration script for user convenience
+  * Fix stale comments on configure() function
+  * Update configure.py to also link external_vars.yml
+  * Update ansible_hosts to typical three tier system
+-- File Changes --
+    M README.md (45)
+    M ansible_hosts (10)
+    A configure.py (166)
+    R playbooks/web.yml (4)
+-- Patch Links --
+https://github.com/glenjarvis/ansible_aws_playbooks/pull/12.patch
+https://github.com/glenjarvis/ansible_aws_playbooks/pull/12.diff
+
+GIT WORK FLOW:
+Although the merges are all done via Pull Requests via GitHub, 
+one can certainly review the branch locally (I suggest it).
+If you're on the develop branch:
+1. `git pull`
+2. `git checkout feature/clarify_for_sharing_with_other_engineers`
+Then you'll be able to look at, test and run the code locally.
+We just don't want to use the `git merge` command (GitHub does that
+behind the scenes).
+
+
+"""
+Most projects have three tiers (development, staging and production). The
+ansible_hosts file has been updated to reflect this system (e.g.,
+production_webservers, staging_webservers, and development_webserver).
+"""
+
+HAMMER CAME DOWN:
+
+Here's the approved list:
+
+git branch
+git branch <branch name>
+git checkout
+git checkout <branch name>
+git pull [but only from develop branch]
+git push origin <branch_name> [ NEVER from develop branch and only from
+feature branches]
+git status
+git add
+git checkout -- <filename>
+
+
+Things against the rule:
+
+git checkout -b <== don't use '-b'
+git push <=== NEVER
+git merge <=== never ever EVER ever
+any fancy option
+You may have to type commands 6 different times to get the same thing.
+That's GOOD. Then you'll understand it.
+
+Throw these on the banned list:
+
+git rebase
+git cherry-pick
+
+There are times to use these. But, I'm going to ask you not to until we
+have a better work flow. 
+
+Suggested steps:
+1) git checkout develop
+2) git pull
+3) git branch feature/bdd_feature_file_formats_r0
+4) git checkout feature/bdd_feature_file_formats_r0
+5) Make the changes that you think are more readable and commit
+6) git push origin feature/bdd_feature_file_formats_r0
+7) Make a new pull request.
+
+
+ADDITIONAL NOTES:
+
+To populate a freshly created github repository from a local repository,
+from the local repository run
+git remote add origin https://github.com/alexKleider/utils.git
+git push -u origin master

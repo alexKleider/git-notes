@@ -1,0 +1,32 @@
+From nicholsonjf.com/blog/tips-n-tricks:
+
+Create a local git repo and push it to Github
+
+Date: 2014-01-03
+Tags: ubuntu, git, github
+Sources: stack overflow post, github
+
+First, create the repo on Github. Make sure to initialize it with a
+README file.
+
+Then, cd into the local directory you want to push.
+
+git init to initialize the local repo.
+
+git add -A to track all files.
+
+git commit -m "commit note" to commit the changes.
+
+# to add the Github repo as a remote:
+git remote add origin https://github.com/username/repo-name.git 
+git remote add origin https://github.com/alexKleider/webmRachel.git
+
+git push --set-upstream origin master
+
+git pull origin master 
+# this will pull down the README file from Github
+# and prevent a fastforward error when you push.
+
+git push origin master 
+# enter your username and password to github. 
+# The github repo should now be caught up with your local repo.

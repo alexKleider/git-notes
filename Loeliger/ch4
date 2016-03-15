@@ -1,0 +1,91 @@
+Initially, learning to interact with only one repository.
+Working with many interconnected repositories: Chapter 11.
+The Git repository is a db containing the information needed to
+    retain and manage    the   revisions and history    of a project.
+It contains a working copy of all the files AND a copy of the repository itself.
+Configuration data is contained with in each repository BUT is not
+propogated during cloning or duplicating. (Hence, I think, for the
+admonition to use git tools rather than rsync.)
+Configuration: per site, per user, per repository.
+TWO Primary DATA Structures:
+1. Object Store:
+  Designed to be copied efficiently (during a clone operation.)
+2. Index:
+  Transitory information private to a repository. 
+  Created or modified on demand and needed.
+
+OBJECT STORE 
+Contains files, log messages, author info, dates, etc. (all that is
+required to rebuild any version or branch of the project.
+Data Structures (Only 4 types of objects.)
+1. Blobs (binary large object)
+ -Holds a files data (without any metadata.)
+2. Trees
+ -Represents one level of directory information
+ -blob identifiers, pathnames, and metadata for each file in one directory.
+ -Can recursively reference other (sub) tree objects. 
+3. Commits
+ -Holds metadata for each repository change.
+ -author, committer, commit date, log message
+ -Points to a tree object.
+ -Initial (root) commit has no parent, others have one (or more.)
+4. Tags
+ -Assigns a (human readable) name to an object (usually a commit.)
+Git compresses and stores objects in pack files, also placed -> object store.
+
+INDEX
+A temporary and dynamic binary file that describes the directory structure
+of the repository at a given time. It can be altered thus providing a
+separation between incremental development steps and commital of changes.
+Changes are "staged" in the index. add, delete, edit
+Changes can be removed or replaced.
+Plays an important roll in merges: see Ch 9.
+
+Content-Addressable Names: SHA1, hash code, objectID.
+See text for discussion of "Content tracking" and relationships between
+objects in the store.
+
+$ git init
+$ find .    # To see the git repository.
+$ find .git/objects  # Changes with each 'git add'.
+Some low level commands you'll do well to understand but don't use:
+$ git cat-file -p <SHA1>   # -p  Pretty print.
+$ git rev-parse <first few digits of SHA1- 4 seems to be enough.>
+$ git ls-files -s  # --stage  includes stage number.
+$ git write-tree  # Action (retrieves tree index) more than reporting command. 
+                  # (Part of what's done by git commit.)
+$ find .git/objects
+$ git cat-file -p <fewDigitsOfHashOfTreeIndex>  # ->files in tree.
+
+p.41 section Tree Hierarchies not covered here- might want to read it.
+
+COMMITS
+A commit can be created by two (not recommended) low level commands:
+$ git write-tree  # To discover current tree.
+$ echo -n "Commit a file that says hello\n" \  # -n supresses the \n
+   | git commit-tree <the discovered SHA1>     # ? also need -e to enable \n
+Better to use 
+$ git commit
+Commits include name of tree object, author, time of composition,
+committer, time of commitment & commit message.  (There are a few
+situations where author and committer are different.)
+$ git show --pretty=fuller  # To see additional commit details.
+
+TAGS  "lightweight vs annotated"
+Lightweight Tags: simply references to a commit object
+        Generally considered private to a repository.
+        Do create a permanent object in the object store.
+Annotated Tag: Creates an object and contains a message (can be GPG signed.)
+        Considered 'permanent' objects.
+        Many Git commands work only on annotated tags.
+$ git tag -m"Tag Ver 1.0" V1.0 <sha1>*  # Creates an unsigned, annotated tag.
+$ git rev-parse V1.0   # Spits out its SHA1.
+$ git cat-file -p <sha1 of tag>  # Spits out SHA1 of the object of the tag.
+
+     
+
+
+
+*
+<SHA1> refers to the whole number.
+<sha1> used when the first few digits will suffice.

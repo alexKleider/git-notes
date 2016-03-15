@@ -1,0 +1,308 @@
+http://git-scm.com/book/en/Getting-Started-Git-Basics
+
+I have "Pro Git book, written by Scott Chacon and published by Apress"
+
+Scott Chacon "Pro Git"
+
+Setup
+>git config ...
+to populate:  (increasing precedence)
+>/etc/gitconfig   --system
+~/.gitconfig  --global
+.git/config  local only
+
+>git config --global user.name "Alex Kleider"
+>git config --global user.email "alex@kleider.ca"
+>git config --global core.editor vim
+>git config --global merge.tool vimdiff
+
+Checking the settings:
+>git config --list
+
+Auto-Completion: p 43ff
+Git Aliases: p 44
+
+HELP
+>git help <verb>
+>git <verb> --help
+>man git-<verb>
+e.g.  git help config
+
+Basics
+A.
+>git init
+>git add
+>vim README.md   [1] http://daringfireball.net/projects/markdown/syntax#p
+>git commit [ -m message ] [ -a ]  [ -v ]  
+    # v puts diff into editor.
+    # a skips the staging step. i.e. does auto add (git add * )
+B.
+>git clone [url][name]  # vs 'checkout'
+    [name] is an option if you want the directory named differently
+    Protocols that can be used:
+        git://
+        http(s)://
+        ssh: user@server:/path/to/dir.git
+
+USAGE
+>git add  # Multipurpose: 
+            To begin tracking new files
+            To stage files
+            Other things: mark merge-conflicted files as resolved.
+>git status
+>cat .gitignore  # use patterns, see p20
+>git diff  # Changes that are unstaged.
+>git diff --cached  # Changes staged but not committed.
+>git diff --staged  # Same command.
+>git commit -v  # Provides for a diff of changes.
+
+>git rm file  # removes from directory and from staging area.
+  >git rm -f file  # If modified version is already in index.
+  !! Dangerous: could result in unrecoverable loss of work.
+>git rm --cached file  # Keep file in directory but no longer
+                       # tracked by git.
+>echo <file> >> .gitignore  # A logical sequel to the above.
+>git mv file_from file_to
+  same as: mv file_from file_to; git rm file_from; git add file_to
+
+File Status Lifecycle
+    Untracked   Unmodified      Modified        Staged
+        |            |              |              |
+        |            |==== Edit ===>|              |
+        |=== Add ===>|              |              |
+        |            |              |=== Stage ===>|
+        |<= Remove ==|              |              |
+        |            |<=======  Commit ============|
+        |<== git rm --cached file ==<==============|
+
+Viewing Commit Hostory:
+> git log -p -2
+    options:
+        -n  # limit to last n commits
+        -p  # show diff introduced in each commit
+        --stat  # abreviated stats: list of modified files.
+        --pretty  # p30
+           =oneline
+           =format:"..."  # see p29
+        short, full, fuller
+        --graph  # Provides branch and merge history.
+        --since=2.weeks  # 
+        --after..
+        --until..  --before..
+        --author..  --committer.. 
+> git log --abbrev-commit
+
+UNDOING THINGS
+1. The commit message:
+>git commit --amend
+    # Uses staging area for commit. 
+    # If no changes since last commit, 
+    # ... effect is only to change commit message.
+
+2. Wrangling staging area and working directory:
+>git reset HEAD <file>  # To unstage.
+>git checkout -- <file>  # To revert changes.  DANGEROUS
+        # Can not recover changes.  [1]
+        # To just get it out of the way, use stashing or branching.
+        # [1] Perhaps git rm --cached <file>  is appropriate here?
+
+REMOTES  read/write or read only (
+> git remote -v  # Lists specified remotes.
+> git remote add [short_name] [URL]
+> git fetch [short_name]  # Can then checkout or merge, etc
+    # Brings data in under [short_name]/master
+    #                      [short_name]/[any other branch names]
+If a branch is set up to track a remote branch (done automatically
+by git clone) can fetch _and_ merge using git pull.
+The 'git pull' command fetches data originally cloned and 
+attempts to merge it with currently checked out branch.
+> git push [remote_name] [branch_name]  # Only works if:
+    - cloned from a server to which
+    - you have write access and
+    - no-one has pushed in the meantime. 
+        - Would have to pull down and incorporate their work first.
+        (to be discussed in chapter 3)
+        Anticipate: do a git fetch on the remote, then try to merge
+        [remote_short_name]/[branch_name] with your branch_name.
+> git remote show <remote_name>
+> git remote rename <old_name> <new_name>  # Also renames branch names.
+> git remote rm <remote_name>
+
+TAGGING
+Typically to mark release points.
+> git tag   # To list (alphabeticaly) the available tags.
+> git tag -l v1.4.2.*  # To narrow the search
+Lightweight tag: just a pointer to a specific commit.
+Annotated tag: stored as full objects.  Recommanded over lightweight.
+    They are check-summed, contain tagger name, e-mail, date, message, etc.
+> git tag -a v1.4 [-m 'my version 1.4']  # creates an annotated tag.
+> git tag -a v1.2 <commit checksum>  # to tag other than current commit.
+> git tag v1.4-lw  # No -l option so a lightweight tag is created.
+Signed Tags  p 40
+Verifying Tags  p 41
+Sharing Taggs:  no default transfers to remotes, must do explicitly.
+git push origin <tag_name>
+git push origin --tags  # Pushes them all.
+
+MERGING
+> git merge <other-file>  # other file is merged into current HEAD.
+1. Fast Forward if branch specified is a direct ancestor
+2. Three way:
+    1. branch you are on
+    2. branch you specify
+    3. common ancestor
+CONFLICT
+Occurs if there are differing changes in same part of same file.
+Merge process is paused (use git status to analyse.)
+Conflict-resolution markers are found in files listed as unmerged.
+After resolving all, run git add on each such file:
+> git add <file>  # In this context, staging marks a file as resolved.
+> git commit  # Finalizes the merge (but provides an out.)
+Summary: merge, resolve, add, commit.
+
+BRANCH MANAGEMENT
+> git branch [-v]  # '*' indicates the checked out (HEAD) branch.
+Useful options: --merged  --no-merged  (into current branch.)
+It's probably OK to delete those that come from the --merged option.
+git branch -d <a_branch>   # Will fail if not merged un (unless -D.)
+
+LONG RUNNING BRANCHES
+Typically master & develop as in gitflow.  (Work 'silos'.)
+master ------------------------->    }  #  work
+    develop -------------------->    }  # silos
+        porposed/pu (proposed updates)  }   #   short
+        topic                           }   #    term
+        hot_fix                         }   #  branches
+
+REMOTE BRANCHES  /  TRACKING BRANCH
+These are refs to state of branches on your remote repositories.
+    These can only be moved using network communication.
+A. CLONE  (automatically creates a tracking branch)
+> git clone: # 1. pulls down all data
+             # 2. creates pointer origin/master (unmovable)
+             # 2. gives you your own master branch (movable)
+After working on your own master, server version of origin/master may have
+changed but can be locally updated with git fetch origin.
+B. TRACKING BRANCH
+Can use git remote add <new_remote> to have more remotes.
+    Then do a git fetch <new_remote> which 
+    sets a '<new_remote>/master branch, NOT locally editable.
+    a. To provide a locally editable version, create a local branch:
+    > git branch <local_name> <new_remote>/<name_of_branch_on_server>
+    Presumably you'd choose <local_name> and <name..server> to be the same.
+    b. If want to avoid the above intermediary step, can merge into local:
+    > git checkout <a_local_branch>
+    > git merge <new_remote>/<name_of_branch_on_server>
+A 'tracking branch' is a local branch that has a direct relationship to a
+remote branch.  (Provides a default for 'git push' and 'git pull'.)
+Distinguish this from a remote in general which includes all branches
+without any relationship to local branches.
+'--track' shorthand:   # Not useful if want a different name.
+> git checkout --track <remote>/<branch>  # creates a local <branch>
+DELETE a REMOTE BRANCH
+> git push <remote>  :<branch2delete>  # Note space before ':'.
+                                # i.e. Empty local branch name.
+            # Take nothing on my side and make it be [remote_branch].
+
+REBASING
+An alternate (to merging) way of integrating changes using the following
+steps:
+1. goes back to common ancestor, 
+2. collects all the diffs needed to get to current branch, 
+3. then attempts to replay them all one after the other onto
+the rebase branch.  
+The rebase branch remains unchanged but becomes one of the commits
+along a single ancestral line.
+If successful, one would then typically do a fast forward on the other
+branch thus ending up with one single line rather than a divergence and
+then a convergence making for a cleaner history.
+Whether doing a merge or a rebase, the final is the same, only the history
+is different.
+Summary: collect diffs between base and topic branches and apply them to
+the base branch or to an --onto branch if specified.
+>git rebase master  # master is the rebase branch, 
+                    # second parameter defaults to currently checked out
+                    # parameter.
+> git rebase <base_branch> <topic_branch> 
+> git rebase --onto master server client  # server is base branch.
+"Check out client branch, 
+collect patches between server and client,
+replay them onto master."
+DO NOT REBASE COMMITS THAT HAVE BEEN PUSHED TO A PUBLIC REPOSITORY!!!!
+Typically rebasing is done just before sharing.
+
+PUSHING
+> git push <remote> <branch>:[remote_branch_name]
+The (local) <branch> parameter is automatically (unless explicitly
+mentioned) expanded to form refs/heads/<name>:refs/heads/<name> so that
+branch name is same locally and on server.
+If want different name on destination server:
+> got push <remote> <local_name>:<remote_name>
+
+SERVER
+In order to do any collaboration must have a remote Git repository.
+- an intermediate Git server: must choose a (combination of) protocol(s)
+and set it up as a 'bare' repository: just the Git data without a checked
+out branch or a working directory.
+Protocols:
+1. Local
+2. SSH
+3. Git
+4. HTTP
+1..3 require git on the server.
+> git clone --bare my_project my_project.git  # clone = init & fetch
+This makes a copy of the .git directory: my_project.git
+which can be "scp -r"ed to user@git.server.info:/opt/git/
+From that directory (i.e. on the server) set group write permissions:
+> git init --bare --shared
+
+Distributed WORKFLOWS
+1. Centralized
+2. Integration-Manager
+2b. Dictator & Lieutenants
+Patterns for Contributing to a Project
+Variables:
+-size: # of contributors and frequency of submissions
+-workflow chosen
+-commit access
+-method of acceptance.
+Commit Guidelines
+A. Before Commit:
+    1. Check for whitespace errors: git diff --check
+    2. Make each commit a logically separate changeset.
+        -one commit per issue
+        -use git add --patch to partially stage files (>1 issue same file)
+B. Quality Commit Message:
+    1. Begin with <= 50 char single line: concise description.
+    2. 2nd line blank
+    3. Detailed explanation:
+        a. Motivation
+        b. Contrast implementation with previous behavior
+        c. Use imperative present tense.
+    4. Best practices:
+    http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
+PRIVATE Small Team
+PRIVATE Managed Team
+PUBLIC Small Project
+PUBLIC Large Project
+
+PROJECT MAINTENANCE
+
+GIT TOOLS
+
+A. REVISION SELECTION
+
+ I. Single Revisions.
+   1. Short SHA: min 4 chars and unambiguous.
+     > git log --abbrev-commit
+     > git show <wxyz>
+   2. Branch References.
+     > git show <branch>
+     > git rev-parse <branch>  # a plumbing tool; returns SHA
+   3. RefLog Shortnames.
+     > git reflog  # Returns @{n} references. (log of branch tip updates)
+     > git show HEAD@{3}  # Purely local.
+   4. Ancestry Reference.
+     '^'[2] suffix == 'parent of', '2' == second parent (if merge.)
+     '~'[n] suffix == 'parent of', n == number of generations.
+II. Commit Ranges.

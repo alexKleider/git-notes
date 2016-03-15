@@ -1,0 +1,10 @@
+ch5
+File Management and the Index  (Things Bart Massey Hates About Git.)
+
+INDEX- a stage between the working directory and the repository.
+- a set of intended or prospective modifications.
+Edit in working directory, accumulate changes in index, commit.
+"git commit <file>" is same as "git add <file>; git commit".
+"git rm <file>; git commit" can not be so combined.
+
+

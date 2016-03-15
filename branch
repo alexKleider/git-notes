@@ -1,0 +1,10 @@
+Git, Version Control with...  by Jon Loeliger    O'Reilly
+
+git branch <branch> [<starting-commit>]  # defaults to current.
+    # Creates a branch name but doesn't change current branch to it.
+git branch   # Lists branch names in local repository
+git branch -r   # in remote repository
+git branch -a   # in both local and remote repositories.
+
+git checkout <branch>  # Changes working directory to <branch>
+

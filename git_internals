@@ -1,0 +1,15 @@
+https://www.youtube.com/watch?v=GFNPoHGeVDM
+
+git init  # creates a .git directory
+ls -l .git =>
+branches
+config
+description
+HEAD   *
+hooks
+info   *
+objects
+refs   *
+
+HEAD points to most recent commits (nothing initially)
+

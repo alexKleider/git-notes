@@ -1,0 +1,2 @@
+.gitignore  # include in repository.
+.git/info/exclude  # local files for exclusion.

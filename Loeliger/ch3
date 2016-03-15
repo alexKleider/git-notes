@@ -1,0 +1,72 @@
+Chpt 3- Getting Started:
+$ git #->usage and list of commonly used commands
+$ git help --all  # ->daunting list of subcommands.
+$ git --version # Do I need to explain?
+$ git commit --amend  # eg of an option specific to a command.
+$ git --git-dir=project.git  repack -d  # eg of combo of 1 and 2 dash opts.
+$ git help subcommand    #   Both do the
+$ git subcommand --help  #   same thing.
+$ git commit    #  Both do the
+$ git-commit    #  same thing.
+$ git commit -m "Fixed a typo."         # short option}   Both do the
+$ git commit --message="Fixed a typo."  # long option }   same thing.
+"bare double dash" is the git (and gnu) way to indicate end of options.
+Use "--" to separate options from argument(s).
+
+Repository Creation: 2 ways-
+1. $ git init
+2. Copy or "clone" an existing repository.
+
+$ cd <directory which is to become repository>
+$ git init  # Creates (and populates) a .git directory.
+A directory containing a .git directory is a git "project working directory."
+The working directory is for you, the .git directory is for git.
+$ git status  # Just what it says- use often (before and after each action.)
+$ git add <file>  # To "stage" file into the repository.
+$ git status  # Run 'git status' often to see what's happening.
+$ git commit -m "<commit message>" \           # One (not the best) way
+    --author="Alex Kleider <alex@kleider.ca>"  # of doing a commit.
+
+CONFIGURATION  (Digression for..)
+Most options can be local to repository OR
+can be global to the user- for this use the --global option.
+Many ways of specifying the editor used for commit messages:
+$ export GIT_EDITOR=vim  # in .bashrc for user.
+$ git config core.editor vim
+..or just edit .git/config file directly.
+$ git config --global user.name "Alex Kleider"
+$ git config --global user.email "alex@kleider.ca"
+$ git config --unset ....    # If you don't like what you've configured.
+$ git config --global alias.show-graph \
+         'log --graph --abbrev-commit --prety=oneline'
+  # Now git show-graph will do what git <what's in quotes> would do.
+
+$ git status  # Get the message? This is a good command to check sanity.
+$ git log  #-> Sequential hx of commits, recent to oldest.
+$ git show <very long number!!>  #-> gives more detail
+$ git show  # With no number, gives details of most recent commit.
+$ git show-branch --more=10  # Default (no option) -> most recent
+    # Provides concise, one-line summaries for current development branch.
+    # 'master' is the default branch name.
+$ git diff <very long number> <another very long number>  # As you'd expect.
+$ git rm <file name>  # Stages removal of a file from the repo.
+    # It's as yet unclear to me if it is removed from the proj working dir.
+$ git mv <file1> <file2>  # Need some experimentation.
+
+OTHER WAY of CREATING a REPOSITORY-  CLONE
+$ git clone <a working git directory> <another directory which is created>
+    # A rich set of repository sources, including network names, is supported.
+    # See Chpt 11.
+
+
+Another Digression- How to push a repository to shed.systemateka.com
+$ git config remote.publish.url 'ssh://shed.systemateka.com/home/alex/Python/Bu'
+$ git config remote.publish.push '+refs/heads/*:refs/heads/*'
+
+
+??? What's a """Vim users can meet this requirement by installing my
+vim-git runtime files, or by simply setting the following option in your
+git commit message file:
+
+:set textwidth=72"""
+from <http://stopwritingramblingcommitmessages.com/>

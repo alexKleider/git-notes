@@ -1,0 +1,23 @@
+http://www.mariopareja.com/blog/archive/2010/01/11/how-to-push-a-new-local-branch-to-a-remote.aspx
+
+$ git push shedrip newbr  # push changes from your newbr branch
+                          # to a newbr branch on the shedrip repository
+# If origin does not have a plugin branch, it is created on the fly.
+
+Someone else can then:
+$ git fetch shedrip  # updates changes from the remote repository
+$ git checkout --track shedrip/newbr  # creates a local matching branch
+# 'else' can modify the code, commit changes and git push them to shedrip.
+# or
+$ git checkout --track shedrip/newbr -b newbr
+# "--track without -b implies branch creation". 
+# Two lines:
+$ git branch NewFeature
+$ git checkout NewFeature
+# are equivalent to:
+$ git checkout -b NewFeature 
+
+# First command might best be
+$ git push --set-upstream shedrip newbr  
+# To make sure your local branch becomes a tracking branch so any changes
+# pushed to the remote will be pulled back into your branch easily.  
